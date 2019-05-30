@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title>Pot Paul</title>
+
+		<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
+		<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+
+		<link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css">
+
+		<link rel="stylesheet" href="dist/css/AdminLTE.css">
+
+		<link rel="stylesheet" href="dist/css/skins/_all-skins.min.css">
+		
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+	</head>
+	<body class="hold-transition skin-blue sidebar-mini">
+		<div class="wrapper">
+			<div class="content-wrapper" style="margin-left:0;">
+				<section class="content">
+					<div class="row" style="height:100%;">
+						<div class="box box-danger direct-chat direct-chat-danger" style="height:100%;">
+							<div class="box-body">
+								<div class="direct-chat-messages"></div>
+							</div>
+							<div class="box-footer">
+								<div class="input-group">
+									<input id="txtconsulta" type="text" name="message" placeholder="Escriba su consulta ..." class="form-control">
+									<span class="input-group-btn">
+										<button id="btnsend" type="submit" class="btn btn-primary btn-flat">Send</button>
+									</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+			</div>
+		</div>
+
+		<!-- jQuery 3 -->
+		<script src="bower_components/jquery/dist/jquery.min.js"></script>
+		<!-- Bootstrap 3.3.7 -->
+		<script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+		<!-- AdminLTE App -->
+		<!--<script src="dist/js/adminlte.min.js"></script>-->
+		<!-- AdminLTE for demo purposes -->
+		<script src="dist/js/demo.js"></script>
+		<script>
+			
+			function getUrlVars() {
+				var vars = {};
+				var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
+					vars[key] = value;
+				});
+				return vars;
+			};
+			
+			function urlify(text) {
+				var urlRegex = /(https?:\/\/[^\s]+)/g;
+				return text.replace(urlRegex, function(url) {
+					return '<a href="' + url + '" target="_blank">' + url + '</a>';
+				})
+				// or alternatively
+				// return text.replace(urlRegex, '<a href="$1">$1</a>')
+			}
+			
+			function send(sessid, queryresolve, is_talk, uname, inst) {
+				var username = uname || 'User Canvas';
+				
+				var token = "64fec0629b074d888a00eb60995ebf5d";
+				
+				if (inst == "idat") {
+					token = "2cd3e74e9130456a94be343b8fbb5eda";
+				}
+				
+				if (is_talk) {
+					var html_user = 
+						'<div class="direct-chat-msg">' + 
+							'<div class="direct-chat-info clearfix">' + 
+								'<span class="direct-chat-name pull-left">' + username + '</span>' + 
+							'</div>' + 
+							'<img class="direct-chat-img" src="dist/img/user.png" alt="Message User Image">' + 
+							'<div class="direct-chat-text">' + $('#txtconsulta').val() + '</div>' + 
+						'</div>';
+						
+					$('#txtconsulta').val('');
+					$('.direct-chat-messages').append(html_user);
+					$(".direct-chat-messages").stop().animate({ scrollTop: $(".direct-chat-messages")[0].scrollHeight}, 500);
+				};
+				
+				var params = {
+					v : '20150910',
+					lang : 'es',
+					query : queryresolve,
+					sessionId : sessid
+				};
+				
+				$.ajax({
+					url: "https://api.dialogflow.com/v1/query?" + $.param(params),
+					type: "GET",
+					beforeSend: function(xhr){
+						xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+					},
+					dataType : 'json',
+					success: function(data) {
+						
+						
+						// var typing = 
+						// '<div id="typing" class="direct-chat-msg right" style="bottom:17px; position:absolute;">'+
+							// '<div class="direct-chat-info clearfix">'+
+								// '<span class="direct-chat-name pull-left"><svg class="lds-typing" width="60px"  height="60px"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" style="background: none;"><circle cx="24.5" cy="48.4263" r="6" fill="#e15b64"><animate attributeName="cy" calcMode="spline" keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5" repeatCount="indefinite" values="62.5;37.5;62.5;62.5" keyTimes="0;0.25;0.5;1" dur="1s" begin="-0.5s"></animate></circle> <circle cx="41.5" cy="62.5" r="6" fill="#f47e60">  <animate attributeName="cy" calcMode="spline" keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5" repeatCount="indefinite" values="62.5;37.5;62.5;62.5" keyTimes="0;0.25;0.5;1" dur="1s" begin="-0.375s"></animate></circle> <circle cx="58.5" cy="62.5" r="6" fill="#f8b26a"><animate attributeName="cy" calcMode="spline" keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5" repeatCount="indefinite" values="62.5;37.5;62.5;62.5" keyTimes="0;0.25;0.5;1" dur="1s" begin="-0.25s"></animate></circle> <circle cx="75.5" cy="62.5" r="6" fill="#abbd81"> <animate attributeName="cy" calcMode="spline" keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5" repeatCount="indefinite" values="62.5;37.5;62.5;62.5" keyTimes="0;0.25;0.5;1" dur="1s" begin="-0.125s"></animate></circle></svg></span>'+
+							// '</div>'+
+						// '</div>';
+						
+						// setTimeout(function(){
+							// $('.content-wrapper').append(typing);
+						// }, 1000)
+						
+						
+						var html_bot = 
+						'<div class="direct-chat-msg right">'+
+							'<div class="direct-chat-info clearfix">'+
+								'<span class="direct-chat-name pull-right">Paul</span>'+
+							'</div>'+
+
+							'<img class="direct-chat-img" src="dist/img/bot.png" alt="Message User Image">'+
+							'<div class="direct-chat-text" style="word-break:break-word;">'+
+								urlify(data.result.fulfillment.speech)
+							'</div>'+
+						'</div>';
+						
+						$('.direct-chat-messages').append(html_bot);
+						$(".direct-chat-messages").stop().animate({ scrollTop: $(".direct-chat-messages")[0].scrollHeight}, 500);
+						
+						// setTimeout(function(){
+							// $('#typing').remove();
+							// $('.direct-chat-messages').append(html_bot);
+							// $(".direct-chat-messages").stop().animate({ scrollTop: $(".direct-chat-messages")[0].scrollHeight}, 500);
+						// }, Math.floor(data.result.fulfillment.speech.length / 6) * 1000)
+					}
+				});
+			};
+			
+			$(document).ready(function(){
+				
+				var uname = getUrlVars()['uname'];
+				var insti = getUrlVars()['inst'];
+				
+				var session_id = Math.random().toString() * 25 + '-' + Math.random().toString(36).substr(2, 9);
+				
+				// send(session_id, 'Hola', false);
+				
+				var html_bot_init = 
+				'<div class="direct-chat-msg right">'+
+					'<div class="direct-chat-info clearfix">'+
+						'<span class="direct-chat-name pull-right">Bot Paul</span>'+
+					'</div>'+
+
+					'<img class="direct-chat-img" src="dist/img/bot.png" alt="Message User Image">'+
+					'<div class="direct-chat-text" style="word-break:break-word;">¡Hola!. ¿En qué puedo ayudarte?</div>'+
+				'</div>';
+				$('.direct-chat-messages').append(html_bot_init);
+				
+				$('#btnsend').click(function(){
+					if($.trim($('#txtconsulta').val()) == "")
+						return false;
+					
+					send(session_id, $.trim($('#txtconsulta').val()), true, decodeURI(uname), insti);
+				});
+				
+				$('#txtconsulta').on("keyup", function(e){
+					var code = e.keyCode;
+					
+					if (code == 13) {
+						if($.trim($('#txtconsulta').val()) == "")
+							return false;
+						
+						send(session_id, $.trim($('#txtconsulta').val()), true, decodeURI(uname), insti);
+					}
+				});
+			});
+		</script>
+	</body>
+</html>
