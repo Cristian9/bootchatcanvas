@@ -67,10 +67,10 @@
 				// return text.replace(urlRegex, '<a href="$1">$1</a>')
 			}
 			
-			function send(sessid, queryresolve, is_talk, uname, inst) {
+			function send(sessid, queryresolve, is_talk, is_button_pressed, uname, inst) {
 				var username = uname || 'User Canvas';
 				
-				var token = "64fec0629b074d888a00eb60995ebf5d";
+				var token = "e781a85690674bc0bc143bf3d1ee28d8  ";
 				
 				if (inst == "idat") {
 					token = "2cd3e74e9130456a94be343b8fbb5eda";
@@ -83,7 +83,7 @@
 								'<span class="direct-chat-name pull-left">' + username + '</span>' + 
 							'</div>' + 
 							'<img class="direct-chat-img" src="dist/img/user.png" alt="Message User Image">' + 
-							'<div class="direct-chat-text">' + $('#txtconsulta').val() + '</div>' + 
+							'<div class="direct-chat-text">' + queryresolve + '</div>' + 
 						'</div>';
 						
 					$('#txtconsulta').val('');
@@ -91,38 +91,57 @@
 					$(".direct-chat-messages").stop().animate({ scrollTop: $(".direct-chat-messages")[0].scrollHeight}, 500);
 				};
 				
-				var params = {
-					v : '20150910',
-					lang : 'es',
-					query : queryresolve,
-					sessionId : sessid
-				};
-				
-				$.ajax({
-					url: "https://api.dialogflow.com/v1/query?" + $.param(params),
-					type: "GET",
-					beforeSend: function(xhr){
-						xhr.setRequestHeader('Authorization', 'Bearer ' + token);
-					},
-					dataType : 'json',
-					success: function(data) {	
-						var html_bot = 
-						'<div class="direct-chat-msg">'+
-							'<div class="direct-chat-info clearfix">'+
-								'<span class="direct-chat-name pull-right">Paul</span>'+
-							'</div>'+
+				if (is_button_pressed) {
+					var params = {
+						v : '20150910',
+						lang : 'es',
+						query : queryresolve,
+						sessionId : sessid
+					};
+					
+					$.ajax({
+						url: "https://api.dialogflow.com/v1/query?" + $.param(params),
+						type: "GET",
+						beforeSend: function(xhr){
+							xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+						},
+						dataType : 'json',
+						success: function(data) {
+							let responses = data.result.fulfillment.speech.split('|');
+							var buttons_response = "";
 
-							'<img class="direct-chat-img" src="dist/img/bot.png" alt="Message User Image">'+
-							'<div class="direct-chat-text" style="word-break:break-word;">'+
-								urlify(data.result.fulfillment.speech)
-							'</div>'+
-						'</div>';
-						
-						$('.direct-chat-messages').append(html_bot);
-						$(".direct-chat-messages").stop().animate({ scrollTop: $(".direct-chat-messages")[0].scrollHeight}, 500);
-					}
-				});
+							for (var i = 1; i < responses.length; i++) {
+								buttons_response += `
+									<button type="button" class="btn btn-block btn-primary" onclick="button_click('${sessid}', this, '${uname}', '${inst}')">
+										${responses[i]}
+									</button>`;
+							}
+
+							let html_response = 
+								`<div class="direct-chat-msg">
+									<div class="direct-chat-info clearfix">
+										<span class="direct-chat-name pull-right">Paul</span>
+									</div>
+
+									<img class="direct-chat-img" src="dist/img/bot.png" alt="Message User Image">
+									<div class="direct-chat-text" style="word-break:break-word;">
+										<span>${responses[0]}</span>
+										<p></p>
+										${buttons_response}
+									</div>
+								</div>`;
+							
+							$('.direct-chat-messages').append(html_response);
+							$(".direct-chat-messages").stop().animate({ scrollTop: $(".direct-chat-messages")[0].scrollHeight}, 500);
+						}
+					});
+				}
 			};
+
+			function button_click(sess_id, obj, uname, insti) {
+				// console.log(sess_id)
+				send(sess_id, $.trim(obj.innerHTML), true, true, decodeURI(uname), insti);
+			}
 			
 			$(document).ready(function(){
 				
@@ -139,11 +158,11 @@
 
 					<img class="direct-chat-img" src="dist/img/bot.png" alt="Message User Image">
 					<div class="direct-chat-text" style="word-break:break-word;">
-						¡Hola!. ¿En qué puedo ayudarte?
+						<span>¡Hola!. ¿En qué puedo ayudarte?</span>
 						<p></p>
-						<button type="button" class="btn btn-block btn-primary">Quiero hacer una consulta sobre Canvas</button>
-						<button type="button" class="btn btn-block btn-primary">Tengo problemas con Canvas</button>
-						<button type="button" class="btn btn-block btn-primary">¿Qué puedo consultar en SAE?</button>
+						<button type="button" class="btn btn-block btn-primary" onclick="button_click('${session_id}', this, '${uname}', '${insti}')">Tengo una consulta sobre Canvas</button>
+						<button type="button" class="btn btn-block btn-primary" onclick="button_click('${session_id}', this, '${uname}', '${insti}')">Estoy teniendo problemas con Canvas</button>
+						<button type="button" class="btn btn-block btn-primary" onclick="button_click('${session_id}', this, '${uname}', '${insti}')">Mi asistencia</button>
 					</div>
 				</div>`;
 
@@ -153,7 +172,7 @@
 					if($.trim($('#txtconsulta').val()) == "")
 						return false;
 					
-					send(session_id, $.trim($('#txtconsulta').val()), true, decodeURI(uname), insti);
+					send(session_id, $.trim($('#txtconsulta').val()), true, false, decodeURI(uname), insti);
 				});
 				
 				$('#txtconsulta').on("keyup", function(e){
@@ -163,7 +182,7 @@
 						if($.trim($('#txtconsulta').val()) == "")
 							return false;
 						
-						send(session_id, $.trim($('#txtconsulta').val()), true, decodeURI(uname), insti);
+						send(session_id, $.trim($('#txtconsulta').val()), true, false, decodeURI(uname), insti);
 					}
 				});
 			});
