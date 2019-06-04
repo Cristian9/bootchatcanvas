@@ -78,7 +78,7 @@
 				
 				if (is_talk) {
 					var html_user = 
-						'<div class="direct-chat-msg">' + 
+						'<div class="direct-chat-msg right">' + 
 							'<div class="direct-chat-info clearfix">' + 
 								'<span class="direct-chat-name pull-left">' + username + '</span>' + 
 							'</div>' + 
@@ -107,7 +107,7 @@
 					dataType : 'json',
 					success: function(data) {	
 						var html_bot = 
-						'<div class="direct-chat-msg right">'+
+						'<div class="direct-chat-msg">'+
 							'<div class="direct-chat-info clearfix">'+
 								'<span class="direct-chat-name pull-right">Paul</span>'+
 							'</div>'+
@@ -132,14 +132,21 @@
 				var session_id = Math.random().toString() * 25 + '-' + Math.random().toString(36).substr(2, 9);
 				
 				var html_bot_init = 
-				'<div class="direct-chat-msg right">'+
-					'<div class="direct-chat-info clearfix">'+
-						'<span class="direct-chat-name pull-right">Bot Paul</span>'+
-					'</div>'+
+				`<div class="direct-chat-msg">
+					<div class="direct-chat-info clearfix">
+						<span class="direct-chat-name">Bot Paul</span>
+					</div>
 
-					'<img class="direct-chat-img" src="dist/img/bot.png" alt="Message User Image">'+
-					'<div class="direct-chat-text" style="word-break:break-word;">¡Hola!. ¿En qué puedo ayudarte?</div>'+
-				'</div>';
+					<img class="direct-chat-img" src="dist/img/bot.png" alt="Message User Image">
+					<div class="direct-chat-text" style="word-break:break-word;">
+						¡Hola!. ¿En qué puedo ayudarte?
+						<p></p>
+						<button type="button" class="btn btn-block btn-primary">Quiero hacer una consulta sobre Canvas</button>
+						<button type="button" class="btn btn-block btn-primary">Tengo problemas con Canvas</button>
+						<button type="button" class="btn btn-block btn-primary">¿Qué puedo consultar en SAE?</button>
+					</div>
+				</div>`;
+
 				$('.direct-chat-messages').append(html_bot_init);
 				
 				$('#btnsend').click(function(){
