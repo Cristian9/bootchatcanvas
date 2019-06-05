@@ -110,6 +110,12 @@
 							let responses = data.result.fulfillment.speech.split('|');
 							var buttons_response = "";
 
+							if (responses.length == 1 && responses[0] !== 'No') {
+								setTimeout(function(){
+									send(sessid, 'Necesito mas ayuda', false, true, decodeURI(uname), inst);
+								}, 10000)
+							}
+
 							for (var i = 1; i < responses.length; i++) {
 								buttons_response += `
 									<button type="button" class="btn btn-block btn-primary" style="white-space: unset;" onclick="button_click('${sessid}', this, '${uname}', '${inst}')">
