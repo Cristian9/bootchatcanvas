@@ -49,6 +49,8 @@
 		<!-- AdminLTE for demo purposes -->
 		<!-- <script src="dist/js/demo.js"></script> -->
 		<script>
+
+			var is_more_help = false;
 			
 			function getUrlVars() {
 				var vars = {};
@@ -69,6 +71,9 @@
 			
 			function send(sessid, queryresolve, is_talk, is_button_pressed, uname, inst) {
 				var username = uname || 'User Canvas';
+
+				if (queryresolve == 'Si')
+					is_more_help = !is_more_help;
 				
 				var token = "e781a85690674bc0bc143bf3d1ee28d8  ";
 				
@@ -110,10 +115,11 @@
 							let responses = data.result.fulfillment.speech.split('|');
 							var buttons_response = "";
 
-							if (responses.length == 1 && queryresolve !== 'No') {
+							if (responses.length == 1 && queryresolve !== 'No' && !is_more_help) {
 								setTimeout(function(){
 									send(sessid, 'Necesito mas ayuda', false, true, decodeURI(uname), inst);
-								}, 10000)
+								}, 10000);
+								is_more_help = !is_more_help;
 							}
 
 							for (var i = 1; i < responses.length; i++) {
