@@ -110,7 +110,7 @@
 							let responses = data.result.fulfillment.speech.split('|');
 							var buttons_response = "";
 
-							if (responses.length == 1 && responses[0] !== 'No') {
+							if (responses.length == 1 && queryresolve !== 'No') {
 								setTimeout(function(){
 									send(sessid, 'Necesito mas ayuda', false, true, decodeURI(uname), inst);
 								}, 10000)
